@@ -141,6 +141,16 @@ public class TeiidAutoConfiguration implements Ordered {
             embeddedConfiguration.setTransactionManager(transactionManager);
         }
         
+        if(embeddedConfiguration.getTransactionManager() == null) {
+        	embeddedConfiguration.setTransactionManager(transactionManager);
+        }
+        
+        if(embeddedConfiguration.getTransports() != null) {
+        	embeddedConfiguration.getTransports().forEach(s -> {
+        		logger.info("Teiid transport listen on " + s.getHostName() + ":" + s.getPortNumber());
+        	});
+        }
+        
         server.start(embeddedConfiguration);
                        
         // this is dummy vdb to satisfy the boot process to create the connections

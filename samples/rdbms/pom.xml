@@ -22,10 +22,14 @@
 			<groupId>org.teiid.spring</groupId>
 			<artifactId>teiid-spring-boot-starter</artifactId>
 		</dependency>
+		<dependency>
+		   <groupId>org.teiid.spring</groupId>
+		   <artifactId>odata</artifactId>
+		   <version>${project.version}</version>
+		</dependency> 
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
 	</dependencies>
 

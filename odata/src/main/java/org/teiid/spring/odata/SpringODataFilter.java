@@ -15,6 +15,7 @@
  */
 package org.teiid.spring.odata;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.sql.Connection;
@@ -45,6 +46,11 @@ public class SpringODataFilter extends ODataFilter {
 
 	private TeiidServer server;
 	
+	private static final String ODATA4_PRIFIX = File.separator + "odata4" + File.separator;
+	
+	private String vdbName = null;
+	private String vdbVersion = null;
+	
 	public SpringODataFilter(TeiidServer server) {
 		this.server = server;
 	}
@@ -69,7 +75,7 @@ public class SpringODataFilter extends ODataFilter {
         contextAwareRequest.setContextPath(contextPath);
         httpRequest = contextAwareRequest;
         
-        VDBKey key = new VDBKey(TeiidConstants.VDBNAME, TeiidConstants.VDBVERSION);
+        VDBKey key = buildVDBKey(uri);
         
         SoftReference<OlingoBridge> ref = this.contextMap.get(key);
         OlingoBridge context = null;
@@ -102,6 +108,18 @@ public class SpringODataFilter extends ODataFilter {
         }
     }
     
+	private VDBKey buildVDBKey(String uri) {
+		if(uri.startsWith(ODATA4_PRIFIX)) {
+			String path = uri.substring(ODATA4_PRIFIX.length());
+			this.vdbName = path.substring(0, path.indexOf(File.separator));
+			this.vdbVersion = "1";
+		} else {
+			this.vdbName = TeiidConstants.VDBNAME;
+			this.vdbVersion = TeiidConstants.VDBVERSION;
+		}
+		return new VDBKey(vdbName, vdbVersion);
+	}
+
 	public String modelName() {
 		Schema schema = server.getSchema("teiid");
 		if (schema != null && !schema.getTables().isEmpty()) {
@@ -110,7 +128,7 @@ public class SpringODataFilter extends ODataFilter {
 
 		String modelName = null;
 		try {						
-			VDB vdb = server.getAdmin().getVDB(TeiidConstants.VDBNAME, TeiidConstants.VDBVERSION);			
+			VDB vdb = server.getAdmin().getVDB(vdbName, vdbVersion);			
 			for (Model m : vdb.getModels()) {
 				if (m.getName().equals("file") || m.getName().equals("rest") || m.getName().equals("teiid")) {
 					continue;

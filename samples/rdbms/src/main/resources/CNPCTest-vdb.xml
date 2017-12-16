@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<vdb name="CNPCTest" version="1">
+<description>CNPCTest VDB</description>
+<property name="validationDateTime" value="Sat Dec 16 09:13:59 CST 2017"/>
+<property name="validationVersion" value="8.12.11"/>
+<model name="APAC_Customers_VBL" type="VIRTUAL">
+<property name="imports" value="APAC_Customers"/>
+<metadata type="DDL"><![CDATA[
+
+CREATE VIEW account (
+	AccountId long NOT NULL OPTIONS(NATIVE_TYPE 'DECIMAL', UPDATABLE 'FALSE'),
+	CustID string(12) NOT NULL OPTIONS(NATIVE_TYPE 'VARCHAR', UPDATABLE 'FALSE'),
+	AccountType string(10) OPTIONS(NATIVE_TYPE 'CHAR', UPDATABLE 'FALSE'),
+	AccountStatus string(10) OPTIONS(NATIVE_TYPE 'CHAR', UPDATABLE 'FALSE'),
+	DATEOPENED timestamp NOT NULL OPTIONS(NATIVE_TYPE 'DATETIME', UPDATABLE 'FALSE'),
+	DATECLOSED timestamp OPTIONS(NATIVE_TYPE 'DATETIME', UPDATABLE 'FALSE'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(AccountId)
+) 
+AS
+	SELECT convert(APAC_Customers.account.AccountId, long) AS AccountId, APAC_Customers.account.CustID, APAC_Customers.account.AccountType, APAC_Customers.account.AccountStatus, APAC_Customers.account.DATEOPENED, APAC_Customers.account.DATECLOSED FROM APAC_Customers.account;
+
+]]></metadata>
+</model>
+<model name="Customers" type="VIRTUAL">
+<property name="imports" value="US_Customers"/>
+<metadata type="DDL"><![CDATA[
+
+CREATE VIEW account (
+	AccountId long NOT NULL OPTIONS(NATIVE_TYPE 'DECIMAL', UPDATABLE 'FALSE'),
+	CustID string(12) NOT NULL OPTIONS(NATIVE_TYPE 'VARCHAR', UPDATABLE 'FALSE'),
+	AccountType string(10) OPTIONS(NATIVE_TYPE 'CHAR', UPDATABLE 'FALSE'),
+	AccountStatus string(10) OPTIONS(NATIVE_TYPE 'CHAR', UPDATABLE 'FALSE'),
+	DATEOPENED timestamp NOT NULL OPTIONS(NATIVE_TYPE 'DATETIME', UPDATABLE 'FALSE'),
+	DATECLOSED timestamp OPTIONS(NATIVE_TYPE 'DATETIME', UPDATABLE 'FALSE'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(AccountId)
+) 
+AS
+	SELECT
+		*
+	FROM
+		APAC_Customers_VBL.account
+UNION ALL
+SELECT
+		*
+	FROM
+		US_Customers_VBL.account;
+
+]]></metadata>
+</model>
+<model name="US_Customers">
+<source connection-jndi-name="US_Customers" name="US_Customers" translator-name="mysql5"/>
+<metadata type="DDL"><![CDATA[
+
+CREATE FOREIGN TABLE account (
+	AccountID bigdecimal(18) NOT NULL OPTIONS(NAMEINSOURCE '`AccountID`', NATIVE_TYPE 'DECIMAL'),
+	SSN string(12) NOT NULL OPTIONS(NAMEINSOURCE '`SSN`', NATIVE_TYPE 'VARCHAR'),
+	AccountType string(10) OPTIONS(NAMEINSOURCE '`AccountType`', NATIVE_TYPE 'CHAR'),
+	AccountStatus string(10) OPTIONS(NAMEINSOURCE '`AccountStatus`', NATIVE_TYPE 'CHAR'),
+	DATEOPENED timestamp NOT NULL OPTIONS(NAMEINSOURCE '`DATEOPENED`', NATIVE_TYPE 'DATETIME'),
+	DATECLOSED timestamp OPTIONS(NAMEINSOURCE '`DATECLOSED`', NATIVE_TYPE 'DATETIME'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(AccountID)
+) OPTIONS(NAMEINSOURCE '`account`', UPDATABLE 'TRUE');
+
+CREATE FOREIGN TABLE accountholdings (
+	TransactionID string(12) NOT NULL OPTIONS(NAMEINSOURCE '`TransactionID`', NATIVE_TYPE 'VARCHAR'),
+	AccountID bigdecimal(18) NOT NULL OPTIONS(NAMEINSOURCE '`AccountID`', NATIVE_TYPE 'DECIMAL'),
+	ProductID string(12) NOT NULL OPTIONS(NAMEINSOURCE '`ProductID`', NATIVE_TYPE 'VARCHAR'),
+	PURCHASEDATE timestamp NOT NULL OPTIONS(NAMEINSOURCE '`PURCHASEDATE`', NATIVE_TYPE 'DATETIME'),
+	ProductShares bigdecimal(20, 6) NOT NULL OPTIONS(NAMEINSOURCE '`ProductShares`', NATIVE_TYPE 'DECIMAL'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(TransactionID)
+) OPTIONS(NAMEINSOURCE '`accountholdings`', UPDATABLE 'TRUE');
+
+CREATE FOREIGN TABLE customer (
+	SSN string(12) NOT NULL OPTIONS(NAMEINSOURCE '`SSN`', NATIVE_TYPE 'VARCHAR'),
+	FIRSTNAME string(25) NOT NULL OPTIONS(NAMEINSOURCE '`FIRSTNAME`', NATIVE_TYPE 'VARCHAR'),
+	LASTNAME string(25) NOT NULL OPTIONS(NAMEINSOURCE '`LASTNAME`', NATIVE_TYPE 'VARCHAR'),
+	MIDDLEInitial string(15) OPTIONS(NAMEINSOURCE '`MIDDLEInitial`', NATIVE_TYPE 'VARCHAR'),
+	StreetAddress1 string(50) NOT NULL OPTIONS(NAMEINSOURCE '`StreetAddress1`', NATIVE_TYPE 'VARCHAR'),
+	AptNumber string(50) OPTIONS(NAMEINSOURCE '`AptNumber`', NATIVE_TYPE 'VARCHAR'),
+	CITY string(25) NOT NULL OPTIONS(NAMEINSOURCE '`CITY`', NATIVE_TYPE 'VARCHAR'),
+	State string(25) OPTIONS(NAMEINSOURCE '`State`', NATIVE_TYPE 'VARCHAR'),
+	ZipCode string(15) NOT NULL OPTIONS(NAMEINSOURCE '`ZipCode`', NATIVE_TYPE 'VARCHAR'),
+	Phone string(30) OPTIONS(NAMEINSOURCE '`Phone`', NATIVE_TYPE 'VARCHAR'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(SSN)
+) OPTIONS(NAMEINSOURCE '`customer`', UPDATABLE 'TRUE');
+
+]]></metadata>
+</model>
+<model name="US_Customers_VBL" type="VIRTUAL">
+<property name="imports" value="US_Customers"/>
+<metadata type="DDL"><![CDATA[
+
+CREATE VIEW account (
+	AccountID long NOT NULL OPTIONS(NATIVE_TYPE 'DECIMAL', UPDATABLE 'FALSE'),
+	SSN string(12) NOT NULL OPTIONS(NATIVE_TYPE 'VARCHAR', UPDATABLE 'FALSE'),
+	AccountType string(10) OPTIONS(NATIVE_TYPE 'CHAR', UPDATABLE 'FALSE'),
+	AccountStatus string(10) OPTIONS(NATIVE_TYPE 'CHAR', UPDATABLE 'FALSE'),
+	DATEOPENED timestamp NOT NULL OPTIONS(NATIVE_TYPE 'DATETIME', UPDATABLE 'FALSE'),
+	DATECLOSED timestamp OPTIONS(NATIVE_TYPE 'DATETIME', UPDATABLE 'FALSE'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(AccountID)
+) 
+AS
+	SELECT convert(US_Customers.account.AccountID, long) AS AccountID, US_Customers.account.SSN, US_Customers.account.AccountType, US_Customers.account.AccountStatus, US_Customers.account.DATEOPENED, US_Customers.account.DATECLOSED FROM US_Customers.account;
+
+]]></metadata>
+</model>
+<model name="APAC_Customers">
+<source connection-jndi-name="APAC_Customers" name="APAC_Customers" translator-name="mysql5"/>
+<metadata type="DDL"><![CDATA[
+
+CREATE FOREIGN TABLE account (
+	AccountId bigdecimal(18) NOT NULL OPTIONS(NAMEINSOURCE '`AccountId`', NATIVE_TYPE 'DECIMAL'),
+	CustID string(12) NOT NULL OPTIONS(NAMEINSOURCE '`CustID`', NATIVE_TYPE 'VARCHAR'),
+	AccountType string(10) OPTIONS(NAMEINSOURCE '`AccountType`', NATIVE_TYPE 'CHAR'),
+	AccountStatus string(10) OPTIONS(NAMEINSOURCE '`AccountStatus`', NATIVE_TYPE 'CHAR'),
+	DATEOPENED timestamp NOT NULL OPTIONS(NAMEINSOURCE '`DATEOPENED`', NATIVE_TYPE 'DATETIME'),
+	DATECLOSED timestamp OPTIONS(NAMEINSOURCE '`DATECLOSED`', NATIVE_TYPE 'DATETIME'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(AccountId)
+) OPTIONS(NAMEINSOURCE '`account`', UPDATABLE 'TRUE');
+
+CREATE FOREIGN TABLE accountholdings (
+	TransactionID string(12) NOT NULL OPTIONS(NAMEINSOURCE '`TransactionID`', NATIVE_TYPE 'VARCHAR'),
+	AccountID bigdecimal(18) NOT NULL OPTIONS(NAMEINSOURCE '`AccountID`', NATIVE_TYPE 'DECIMAL'),
+	ProductID string(12) NOT NULL OPTIONS(NAMEINSOURCE '`ProductID`', NATIVE_TYPE 'VARCHAR'),
+	PURCHASEDATE timestamp NOT NULL OPTIONS(NAMEINSOURCE '`PURCHASEDATE`', NATIVE_TYPE 'DATETIME'),
+	ProductShares bigdecimal(20, 6) OPTIONS(NAMEINSOURCE '`ProductShares`', NATIVE_TYPE 'DECIMAL'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(TransactionID)
+) OPTIONS(NAMEINSOURCE '`accountholdings`', UPDATABLE 'TRUE');
+
+CREATE FOREIGN TABLE customer (
+	CustID string(12) NOT NULL OPTIONS(NAMEINSOURCE '`CustID`', NATIVE_TYPE 'VARCHAR'),
+	F_name string(25) NOT NULL OPTIONS(NAMEINSOURCE '`F_name`', NATIVE_TYPE 'VARCHAR'),
+	L_name string(25) NOT NULL OPTIONS(NAMEINSOURCE '`L_name`', NATIVE_TYPE 'VARCHAR'),
+	M_name string(15) OPTIONS(NAMEINSOURCE '`M_name`', NATIVE_TYPE 'VARCHAR'),
+	StreetAddress string(50) NOT NULL OPTIONS(NAMEINSOURCE '`StreetAddress`', NATIVE_TYPE 'VARCHAR'),
+	StreetAddress2 string(50) OPTIONS(NAMEINSOURCE '`StreetAddress2`', NATIVE_TYPE 'VARCHAR'),
+	CITY string(25) NOT NULL OPTIONS(NAMEINSOURCE '`CITY`', NATIVE_TYPE 'VARCHAR'),
+	StateProvince string(25) OPTIONS(NAMEINSOURCE '`StateProvince`', NATIVE_TYPE 'VARCHAR'),
+	POSTALCODE string(15) OPTIONS(NAMEINSOURCE '`POSTALCODE`', NATIVE_TYPE 'VARCHAR'),
+	COUNTRY string(10) OPTIONS(NAMEINSOURCE '`COUNTRY`', NATIVE_TYPE 'VARCHAR'),
+	PhoneNumber string(30) OPTIONS(NAMEINSOURCE '`PhoneNumber`', NATIVE_TYPE 'VARCHAR'),
+	CONSTRAINT "PRIMARY" PRIMARY KEY(CustID)
+) OPTIONS(NAMEINSOURCE '`customer`', UPDATABLE 'TRUE');
+
+]]></metadata>
+</model>
+</vdb>

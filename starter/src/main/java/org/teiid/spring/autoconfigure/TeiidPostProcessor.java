@@ -56,6 +56,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.teiid.adminapi.impl.VDBMetaData;
 import org.teiid.adminapi.impl.VDBMetadataParser;
 import org.teiid.spring.data.BaseConnectionFactory;
+import org.teiid.translator.ExecutionFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -110,6 +111,11 @@ class TeiidPostProcessor implements BeanPostProcessor, Ordered, ApplicationListe
             VDBMetaData vdb = this.beanFactory.getBean(VDBMetaData.class);
             server.addDataSource(vdb, beanName, (BaseConnectionFactory)bean, context);                     
             logger.info("Non JDBC Datasource added to Teiid = " + beanName);
+		} else if (bean instanceof ExecutionFactory) {
+			TeiidServer server = this.beanFactory.getBean(TeiidServer.class);
+			ExecutionFactory<?,?> ef = this.beanFactory.getBean(ExecutionFactory.class);
+			server.addTranslator(beanName, ef);
+			logger.info("Teiid translator \"" + beanName + "\" added.");
 		}
 		return bean;
 	}
